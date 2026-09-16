@@ -1,0 +1,6 @@
+boto3>=1.42.49,<2
+urllib3>=2.6.3,<3
+certifi>=2026.2.25
+google-auth[requests]>=2.38,<3
+Pillow>=11,<13
+pypdf>=6.18.1,<7

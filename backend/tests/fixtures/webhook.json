@@ -1,0 +1,28 @@
+{
+  "submission": {
+    "id": "sample-webhook-1",
+    "form_id": "sample-form",
+    "created_at": "2026-09-07T18:00:00Z",
+    "responses": [
+      {
+        "label": "Name",
+        "value": "Amit Kumar"
+      },
+      {
+        "label": "Email",
+        "value": "amit@example.com"
+      },
+      {
+        "label": "Theme",
+        "value": "Education"
+      },
+      {
+        "label": "File upload",
+        "value": {
+          "name": "amit-kumar.pdf",
+          "url": "http://127.0.0.1:8001/files/sample.pdf"
+        }
+      }
+    ]
+  }
+}

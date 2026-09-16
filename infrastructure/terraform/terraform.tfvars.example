@@ -1,0 +1,22 @@
+aws_region = "eu-north-1"
+environment = "prod"
+project_name = "profile-library"
+neetform_api_base_url = "https://jso.neetoform.com/api/external/v1"
+neetform_form_id = "4c47b1a6-144c-44ea-a6ce-0a151cdcb630"
+# Hosts verified for the supplied NeetoForm workspace. Reconfirm if storage changes.
+neeto_attachment_hosts = ["app.neetoform.com", "neeto-form-production-v3.s3.amazonaws.com"]
+neeto_field_mapping = {
+  name = "name"
+  email = "email"
+  linkedin = "linkedin"
+  support = "I'm willing to support this casue by"
+  # For an internal custom column, replace with its field_id (see docs/neetform-setup.md).
+  theme = "theme"
+  file = "file_upload"
+}
+# Reuse an existing pool in the selected region, or leave empty to create one.
+existing_cognito_user_pool_id = ""
+required_group = ""
+# Optional custom domain with an existing ACM certificate in us-east-1.
+frontend_domain = ""
+frontend_certificate_arn = ""
