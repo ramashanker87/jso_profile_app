@@ -35,7 +35,8 @@ class Runtime:
         from src.services.job_opening_service import JobOpeningService
         if self.job_openings is None:
             raise AppError("Jobs are not configured.", 503, "NOT_CONFIGURED")
-        return JobOpeningService(self.job_openings)
+        return JobOpeningService(self.job_openings, getattr(self.storage, "client", None),
+                                 getattr(self.storage, "bucket", None))
 
     def sambhav_service(self):
         from src.services.sambhav_service import SambhavService

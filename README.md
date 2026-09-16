@@ -20,7 +20,7 @@ AWS resource names retain the `profile-library` prefix used by the application.
 - **Members:** search active members; combine chapter, country, and region filters; view a country map; and open member details. **Active members** shows the count matching all selected filters and search, before pagination. Clearing filters restores the full count when search is also empty.
 - **Member self-editing:** members can update supported personal fields when their verified login email matches the record. Personal edits survive source synchronization.
 - **Sambhav:** nine domains with three idea slots each. Approved users can edit domain and idea content, assign members, and upload PDF attachments. Version checks prevent stale saves from overwriting newer edits.
-- **Jobs:** paste a job-opening link with an optional title. Open the original website to read the description; approved users can delete a closed listing after confirmation. Listings are shared and persist in DynamoDB.
+- **Jobs:** share a job-opening link with an optional title, short description, and candidate/job profile PDFs. Approved users can download attachments or delete a closed listing after confirmation. Listings persist in DynamoDB; up to 10 PDFs per job (20 MB each) are stored in private S3.
 - **Authentication:** Google or email/password sign-in through Cognito. New accounts require membership in `profile-library-users` before accessing application data.
 
 ## Design and architecture
@@ -64,7 +64,7 @@ flowchart TD
 | `profile-library-prod-jobs` | Sync status, checkpoints, and coordination leases |
 | `profile-library-prod-sambhav` | Domain/idea content and expiring upload tickets |
 | `profile-library-prod-job-openings` | Shared job-opening links, titles, and creation details |
-| Private document S3 bucket | Submission PDFs, member photos, and Sambhav PDFs |
+| Private document S3 bucket | Submission PDFs, member photos, Sambhav PDFs, and job attachments |
 | Private frontend S3 bucket | Compiled HTML, JavaScript, CSS, and map geometry |
 | Secrets Manager | Integration credentials and Google OAuth configuration |
 
@@ -139,7 +139,7 @@ make dev
 
 Open [http://localhost:5173](http://localhost:5173). Setup installs dependencies and creates `frontend/.env.local` from its example if the file does not already exist.
 
-The default mock mode requires no AWS credentials and accepts nonempty demo login credentials. It includes fictional Idea Incubation submissions and a sample PDF. Jobs added in demo mode remain in memory until the page is reloaded. The mock member directory is empty; Sambhav edits are temporary and PDF uploads are unavailable.
+The default mock mode requires no AWS credentials and accepts nonempty demo login credentials. It includes fictional Idea Incubation submissions and a sample PDF. Jobs and their temporary attachments added in demo mode remain in memory until the page is reloaded. The mock member directory is empty; Sambhav edits are temporary and PDF uploads are unavailable.
 
 If an existing environment file disables mock mode, start explicitly with:
 
@@ -169,7 +169,7 @@ VITE_USE_MOCK_API=false VITE_USE_LOCAL_API=true \
 
 Open [http://localhost:5173](http://localhost:5173), sign in with demo credentials, and use **Sync Now** in Idea Incubation to import sample submissions.
 
-The local adapter uses in-memory repositories and a development token. Downloaded sample files are stored under `.build/local-documents`. This workflow exercises submission sync, document handling, and adding/deleting job links (kept in memory until the API restarts); it does not reproduce production Cognito authorization, DynamoDB persistence, or S3 uploads.
+The local adapter uses in-memory repositories and a development token. Downloaded sample files are stored under `.build/local-documents`. This workflow exercises submission sync, document handling, and adding/deleting job links (kept in memory until the API restarts); it does not reproduce production Cognito authorization, DynamoDB persistence, or S3 uploads. Job attachment inputs are disabled in this local API mode.
 
 ### Tests and builds
 
@@ -252,7 +252,7 @@ curl --fail --silent --show-error \
 
 The HTTP check verifies that the frontend is reachable. In a browser, sign in with an approved account and check the changed feature. For member-count changes, select chapter, country, and region filters and confirm that **Active members** matches the filtered list total, including zero results.
 
-The Jobs feature requires the full deployment: it adds the `profile-library-prod-job-openings` table, API routes, and API Lambda permissions. Deploy the backend/infrastructure before publishing the Jobs frontend.
+The Jobs feature requires the full deployment: the `profile-library-prod-job-openings` table, upload/download API routes, API Lambda permissions, upload-ticket TTL, and S3 staging expiration. Deploy the backend/infrastructure before publishing the Jobs frontend. See [Jobs](docs/jobs.md) for attachment storage and retry behavior.
 
 ## User access and integration configuration
 

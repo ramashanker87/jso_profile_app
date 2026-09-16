@@ -26,12 +26,12 @@ resource "aws_apigatewayv2_integration" "api" {
   timeout_milliseconds   = 30000
 }
 resource "aws_apigatewayv2_route" "authenticated" {
-  for_each             = toset(["GET /job-openings", "POST /job-openings", "DELETE /job-openings/{id}", "GET /sambhav", "GET /sambhav/domain", "POST /sambhav/domain", "POST /sambhav/upload", "POST /sambhav/upload/complete", "GET /sambhav/document", "POST /members/detail", "POST /members/sync", "GET /members/sync", "GET /members/sync/{jobId}", "GET /members", "GET /members/detail", "GET /profiles", "GET /profiles/{profileId}", "GET /profiles/{profileId}/document", "POST /sync", "GET /sync", "GET /sync/{jobId}"])
-  api_id               = aws_apigatewayv2_api.api.id
-  route_key            = each.value
-  target               = "integrations/${aws_apigatewayv2_integration.api.id}"
-  authorization_type   = "JWT"
-  authorizer_id        = aws_apigatewayv2_authorizer.cognito.id
+  for_each           = toset(["GET /job-openings", "POST /job-openings", "DELETE /job-openings/{id}", "POST /job-openings/{id}/upload", "POST /job-openings/{id}/upload/complete", "GET /job-openings/{id}/attachments/{documentId}", "GET /sambhav", "GET /sambhav/domain", "POST /sambhav/domain", "POST /sambhav/upload", "POST /sambhav/upload/complete", "GET /sambhav/document", "POST /members/detail", "POST /members/sync", "GET /members/sync", "GET /members/sync/{jobId}", "GET /members", "GET /members/detail", "GET /profiles", "GET /profiles/{profileId}", "GET /profiles/{profileId}/document", "POST /sync", "GET /sync", "GET /sync/{jobId}"])
+  api_id             = aws_apigatewayv2_api.api.id
+  route_key          = each.value
+  target             = "integrations/${aws_apigatewayv2_integration.api.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
   # API Gateway accepts either scope. Google OAuth issues openid; password
   # login issues Cognito's API scope. Lambda still checks token_use and group.
   authorization_scopes = local.google_configured ? ["aws.cognito.signin.user.admin", "openid"] : ["aws.cognito.signin.user.admin"]

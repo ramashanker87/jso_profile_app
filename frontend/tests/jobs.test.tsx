@@ -13,8 +13,15 @@ vi.mock("../src/auth/client", () => ({
   onAuthChange: vi.fn(() => () => {}),
   logout: vi.fn(),
 }));
-vi.mock("../src/services/jobsApi", () => ({
-  jobsApi: { list: vi.fn(), create: vi.fn(), remove: vi.fn() },
+vi.mock("../src/services/jobsApi", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/services/jobsApi")>()),
+  jobsApi: {
+    list: vi.fn(),
+    create: vi.fn(),
+    remove: vi.fn(),
+    upload: vi.fn(),
+    download: vi.fn(),
+  },
 }));
 const job = {
   id: "job-one",
@@ -46,7 +53,7 @@ it("adds a pasted link, opens the original description, and persists on reload",
   ).toHaveAttribute("aria-current", "page");
   await user.type(screen.getByLabelText("Job-opening link"), job.url);
   await user.click(screen.getByRole("button", { name: "Add job" }));
-  expect(jobsApi.create).toHaveBeenCalledWith(job.url, "");
+  expect(jobsApi.create).toHaveBeenCalledWith(job.url, "", "");
   const link = await screen.findByRole("link", {
     name: /View job description/,
   });
@@ -133,4 +140,184 @@ it("retries a failed list request", async () => {
   );
   await userEvent.click(screen.getByRole("button", { name: "Retry" }));
   expect(await screen.findByText("No job openings yet")).toBeInTheDocument();
+});
+
+it("saves descriptions and both attachment categories, then downloads a file", async () => {
+  const user = userEvent.setup();
+  const candidate = new File(["pdf"], "candidate.pdf", {
+    type: "application/pdf",
+  });
+  const profile = new File(["pdf"], "role.pdf", { type: "application/pdf" });
+  const first = {
+    ...job,
+    description: "Remote role",
+    attachments: [
+      {
+        id: "candidate",
+        category: "candidate-profile" as const,
+        fileName: candidate.name,
+        size: 3,
+      },
+    ],
+  };
+  const complete = {
+    ...first,
+    attachments: [
+      ...first.attachments,
+      {
+        id: "role",
+        category: "job-profile" as const,
+        fileName: profile.name,
+        size: 3,
+      },
+    ],
+  };
+  vi.mocked(jobsApi.upload)
+    .mockResolvedValueOnce(first)
+    .mockResolvedValueOnce(complete);
+  vi.mocked(jobsApi.download).mockResolvedValue(undefined);
+  show();
+  await user.type(await screen.findByLabelText("Job-opening link"), job.url);
+  await user.type(
+    screen.getByLabelText("Short description (optional)"),
+    "Remote role",
+  );
+  await user.upload(screen.getByLabelText("Candidate profiles"), candidate);
+  await user.upload(screen.getByLabelText("Job profiles"), profile);
+  await user.click(screen.getByRole("button", { name: "Add job" }));
+  expect(
+    await screen.findByText("Job opening added with attachments."),
+  ).toBeInTheDocument();
+  expect(jobsApi.create).toHaveBeenCalledWith(job.url, "", "Remote role");
+  expect(jobsApi.upload).toHaveBeenNthCalledWith(
+    1,
+    job.id,
+    "candidate-profile",
+    candidate,
+  );
+  expect(jobsApi.upload).toHaveBeenNthCalledWith(
+    2,
+    job.id,
+    "job-profile",
+    profile,
+  );
+  expect(screen.getByText("Remote role")).toBeInTheDocument();
+  expect(screen.getByLabelText("Short description (optional)")).toHaveValue("");
+  await user.click(
+    screen.getByRole("button", { name: "Download candidate.pdf" }),
+  );
+  expect(jobsApi.download).toHaveBeenCalledWith(job.id, "candidate");
+});
+
+it("retries only remaining attachments without creating another job", async () => {
+  const user = userEvent.setup();
+  const first = new File(["pdf"], "first.pdf", { type: "application/pdf" });
+  const second = new File(["pdf"], "second.pdf", { type: "application/pdf" });
+  const saved = {
+    ...job,
+    attachments: [
+      {
+        id: "first",
+        category: "job-profile" as const,
+        fileName: "first.pdf",
+        size: 3,
+      },
+    ],
+  };
+  vi.mocked(jobsApi.upload)
+    .mockResolvedValueOnce(saved)
+    .mockRejectedValueOnce(new Error("Network error."))
+    .mockResolvedValueOnce({
+      ...saved,
+      attachments: [
+        ...saved.attachments,
+        { ...saved.attachments[0], id: "second", fileName: "second.pdf" },
+      ],
+    });
+  show();
+  await user.type(await screen.findByLabelText("Job-opening link"), job.url);
+  await user.upload(screen.getByLabelText("Job profiles"), [first, second]);
+  await user.click(screen.getByRole("button", { name: "Add job" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Job saved.");
+  expect(
+    screen.getByRole("button", { name: "Download first.pdf" }),
+  ).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Retry attachments" }));
+  expect(
+    await screen.findByText("Job opening added with attachments."),
+  ).toBeInTheDocument();
+  expect(jobsApi.create).toHaveBeenCalledTimes(1);
+  expect(jobsApi.upload).toHaveBeenCalledTimes(3);
+  expect(jobsApi.upload).toHaveBeenLastCalledWith(
+    job.id,
+    "job-profile",
+    second,
+  );
+});
+
+it("keeps a saved job when the user skips a failed attachment", async () => {
+  const user = userEvent.setup();
+  vi.mocked(jobsApi.upload).mockRejectedValueOnce(new Error("Invalid PDF."));
+  show();
+  await user.type(await screen.findByLabelText("Job-opening link"), job.url);
+  await user.upload(
+    screen.getByLabelText("Candidate profiles"),
+    new File(["pdf"], "bad.pdf", { type: "application/pdf" }),
+  );
+  await user.click(screen.getByRole("button", { name: "Add job" }));
+  await user.click(
+    await screen.findByRole("button", {
+      name: "Keep job without remaining attachments",
+    }),
+  );
+  expect(screen.getByRole("link", { name: "Engineer" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Add job" })).toBeEnabled();
+  expect(screen.getByLabelText("Job-opening link")).toHaveValue("");
+  expect(jobsApi.remove).not.toHaveBeenCalled();
+});
+
+it("rejects too many attachments before creating the job", async () => {
+  const user = userEvent.setup();
+  show();
+  await user.type(await screen.findByLabelText("Job-opening link"), job.url);
+  await user.upload(
+    screen.getByLabelText("Job profiles"),
+    Array.from(
+      { length: 11 },
+      (_, i) => new File(["pdf"], `${i}.pdf`, { type: "application/pdf" }),
+    ),
+  );
+  await user.click(screen.getByRole("button", { name: "Add job" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("10 attachments");
+  expect(jobsApi.create).not.toHaveBeenCalled();
+});
+
+it("shows a download error and disables uploads when local storage is unavailable", async () => {
+  vi.mocked(jobsApi.list).mockResolvedValue({
+    items: [
+      {
+        ...job,
+        attachments: [
+          {
+            id: "doc",
+            category: "job-profile",
+            fileName: "job.pdf",
+            size: 100,
+          },
+        ],
+      },
+    ],
+    uploadsEnabled: false,
+  });
+  vi.mocked(jobsApi.download).mockRejectedValueOnce(
+    new Error("Download unavailable."),
+  );
+  show();
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Download job.pdf" }),
+  );
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Download unavailable.",
+  );
+  expect(screen.getByLabelText("Job profiles")).toBeDisabled();
 });

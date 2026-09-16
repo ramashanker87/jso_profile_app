@@ -238,3 +238,32 @@ creation, persistent listing, duplicate rejection, and deletion; the temporary
 verification listing was removed. API Gateway rejected anonymous Jobs access
 with HTTP 401. Frontend assets were published and CloudFront invalidation requested.
 A real signed-in browser session was not exercised during this deployment.
+
+## Jobs descriptions and private PDF attachments — 16 September 2026
+
+Deployed optional short descriptions and candidate/job profile PDF attachments
+on `/jobs`. Each job supports 10 PDFs up to 20 MB each, stored in the existing
+private document bucket under `job-openings/`. Approved users download files
+through temporary signed links. Failed uploads can be retried without creating
+another listing. See [Jobs](jobs.md) for storage and retry behavior.
+
+Verified account `223885744552`, AWS profile `jso`, region `us-east-1`, and workspace
+`jso` before deployment. Terraform applied three new authenticated routes and five
+in-place updates (API IAM, job-table TTL, API/worker packages, and S3 lifecycle),
+with no resource deletions or replacements. The post-deployment plan reports no
+changes. A local pre-deployment state backup and plan are retained under the
+ignored `.build/jobs-attachments-deploy/` directory.
+
+Validation: 187 backend tests, 61 frontend tests, the production frontend build,
+and Terraform validation passed. Live Lambda calls with simulated authorizer
+claims verified approval enforcement, description persistence, both attachment
+categories, idempotent confirmation, and attachment deletion. Actual signed S3
+POSTs and downloads verified CORS, byte-for-byte PDF contents, encryption, and
+private access; anonymous API Gateway requests returned HTTP 401. The temporary
+verification listing, published PDFs, staging objects, and upload tickets were
+removed. No real user's login session was used for these checks.
+
+Published the production frontend and completed CloudFront invalidation
+`I9OPH5T22BV23LQX80VBRWUKWF`. Live `/` and `/jobs` HTML and referenced JavaScript/CSS
+match the local production build; the JavaScript includes the new description,
+attachment, and retry controls. A real signed-in browser flow was not exercised.

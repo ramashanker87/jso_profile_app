@@ -68,9 +68,16 @@ resource "aws_s3_bucket_cors_configuration" "documents" {
 resource "aws_s3_bucket_lifecycle_configuration" "sambhav_uploads" {
   bucket = aws_s3_bucket.documents.id
   rule {
-    id = "expire-incomplete-sambhav-uploads"
+    id     = "expire-incomplete-sambhav-uploads"
     status = "Enabled"
     filter { prefix = "sambhav/pending/" }
+    expiration { days = 1 }
+    abort_incomplete_multipart_upload { days_after_initiation = 1 }
+  }
+  rule {
+    id     = "expire-incomplete-job-uploads"
+    status = "Enabled"
+    filter { prefix = "job-openings/pending/" }
     expiration { days = 1 }
     abort_incomplete_multipart_upload { days_after_initiation = 1 }
   }

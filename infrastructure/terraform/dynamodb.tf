@@ -38,9 +38,9 @@ resource "aws_dynamodb_table" "member_details" {
 }
 
 resource "aws_dynamodb_table" "sambhav" {
-  name = "${local.name}-sambhav"
+  name         = "${local.name}-sambhav"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "id"
+  hash_key     = "id"
   attribute {
     name = "id"
     type = "S"
@@ -49,7 +49,7 @@ resource "aws_dynamodb_table" "sambhav" {
   point_in_time_recovery { enabled = true }
   ttl {
     attribute_name = "expiresAt"
-    enabled = true
+    enabled        = true
   }
   deletion_protection_enabled = true
   lifecycle { prevent_destroy = true }
@@ -65,6 +65,10 @@ resource "aws_dynamodb_table" "job_openings" {
   }
   server_side_encryption { enabled = true }
   point_in_time_recovery { enabled = true }
+  ttl {
+    attribute_name = "expiresAt"
+    enabled        = true
+  }
   deletion_protection_enabled = true
   lifecycle { prevent_destroy = true }
 }

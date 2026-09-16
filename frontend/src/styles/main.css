@@ -702,3 +702,11 @@ select {
 .job-url { font-size: 14px; color: #52665a; }
 .job-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
 .job-delete-confirm { margin-top: 18px; border-top: 1px solid #dce5dd; padding-top: 12px; }
+
+.job-form textarea { display: block; width: 100%; padding: 10px; font: inherit; border: 1px solid #b8c9bd; border-radius: 8px; resize: vertical; }
+.job-files { min-width: 0; margin: 20px 0; padding: 16px; border: 1px solid #b8c9bd; border-radius: 8px; }
+.job-description { white-space: pre-wrap; overflow-wrap: anywhere; }
+.job-attachments ul, .job-selected-files { padding-left: 20px; }
+.job-attachments li, .job-selected-files li { margin-bottom: 12px; overflow-wrap: anywhere; }
+.job-attachments li > *, .job-selected-files button { margin-right: 10px; }
+.job-attachments button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: left; }
