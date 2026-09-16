@@ -19,5 +19,5 @@ distribution=$("${tf[@]}" output -raw cloudfront_distribution_id)
 # assets immediately, so browsers with the previous HTML keep working.
 aws s3 sync frontend/dist/ "s3://$bucket/" --exclude index.html --exclude sample-profile.pdf --cache-control 'public,max-age=31536000,immutable' --only-show-errors
 aws s3 cp frontend/dist/index.html "s3://$bucket/index.html" --cache-control 'no-cache,no-store,must-revalidate' --content-type text/html --only-show-errors
-aws cloudfront create-invalidation --distribution-id "$distribution" --paths / /index.html /login /signup '/profiles/*' /members '/members/*' --query Invalidation.Id --output text
+aws cloudfront create-invalidation --distribution-id "$distribution" --paths / /index.html /login /signup '/profiles/*' /members '/members/*' /jobs --query Invalidation.Id --output text
 "${tf[@]}" output

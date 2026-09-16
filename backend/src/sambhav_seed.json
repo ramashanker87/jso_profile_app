@@ -1,0 +1,56 @@
+[
+  {
+    "code": "01",
+    "title": "FinTech & Financial Inclusion",
+    "slug": "fintech-financial-inclusion",
+    "sourcePageReference": 6
+  },
+  {
+    "code": "02",
+    "title": "AI-Driven Skills Mapping & Entrepreneurship",
+    "slug": "ai-skills-mapping-entrepreneurship",
+    "sourcePageReference": 7
+  },
+  {
+    "code": "03",
+    "title": "Primary, Middle & School Education",
+    "slug": "primary-middle-school-education",
+    "sourcePageReference": 8
+  },
+  {
+    "code": "04",
+    "title": "Higher Education, STEM & Research",
+    "slug": "higher-education-stem-research",
+    "sourcePageReference": 9
+  },
+  {
+    "code": "05",
+    "title": "Content Creation, Media & Public Outreach",
+    "slug": "content-media-public-outreach",
+    "sourcePageReference": 10
+  },
+  {
+    "code": "06",
+    "title": "Community Policy, Governance & Social Research",
+    "slug": "community-policy-governance-social-research",
+    "sourcePageReference": 11
+  },
+  {
+    "code": "07",
+    "title": "Healthcare & Public Health",
+    "slug": "healthcare-public-health",
+    "sourcePageReference": 12
+  },
+  {
+    "code": "08",
+    "title": "Agriculture, Environment & Sustainability",
+    "slug": "agriculture-environment-sustainability",
+    "sourcePageReference": 13
+  },
+  {
+    "code": "09",
+    "title": "Engineering, Industrial & Vocational Skill Development",
+    "slug": "engineering-industrial-vocational-skills",
+    "sourcePageReference": 14
+  }
+]

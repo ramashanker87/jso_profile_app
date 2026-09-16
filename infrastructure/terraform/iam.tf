@@ -18,6 +18,7 @@ resource "aws_iam_role_policy" "api" {
     { Effect = "Allow", Action = ["dynamodb:GetItem", "dynamodb:Scan"], Resource = [aws_dynamodb_table.profiles.arn, aws_dynamodb_table.member_details.arn] },
     { Effect = "Allow", Action = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem"], Resource = aws_dynamodb_table.jobs.arn },
     { Effect = "Allow", Action = ["dynamodb:GetItem", "dynamodb:PutItem"], Resource = aws_dynamodb_table.sambhav.arn },
+    { Effect = "Allow", Action = ["dynamodb:Scan", "dynamodb:PutItem", "dynamodb:DeleteItem"], Resource = aws_dynamodb_table.job_openings.arn },
     { Effect = "Allow", Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"], Resource = "${aws_s3_bucket.documents.arn}/sambhav/*" },
     { Effect = "Allow", Action = ["s3:GetObject"], Resource = "${aws_s3_bucket.documents.arn}/profiles/*" },
     { Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = aws_secretsmanager_secret.neeto.arn },

@@ -3,7 +3,7 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
   cors_configuration {
     allow_origins = [local.frontend_origin]
-    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_methods = ["GET", "POST", "DELETE", "OPTIONS"]
     allow_headers = ["authorization", "content-type"]
     max_age       = 300
   }
@@ -26,7 +26,7 @@ resource "aws_apigatewayv2_integration" "api" {
   timeout_milliseconds   = 30000
 }
 resource "aws_apigatewayv2_route" "authenticated" {
-  for_each             = toset(["GET /sambhav", "GET /sambhav/domain", "POST /sambhav/domain", "POST /sambhav/upload", "POST /sambhav/upload/complete", "GET /sambhav/document", "POST /members/detail", "POST /members/sync", "GET /members/sync", "GET /members/sync/{jobId}", "GET /members", "GET /members/detail", "GET /profiles", "GET /profiles/{profileId}", "GET /profiles/{profileId}/document", "POST /sync", "GET /sync", "GET /sync/{jobId}"])
+  for_each             = toset(["GET /job-openings", "POST /job-openings", "DELETE /job-openings/{id}", "GET /sambhav", "GET /sambhav/domain", "POST /sambhav/domain", "POST /sambhav/upload", "POST /sambhav/upload/complete", "GET /sambhav/document", "POST /members/detail", "POST /members/sync", "GET /members/sync", "GET /members/sync/{jobId}", "GET /members", "GET /members/detail", "GET /profiles", "GET /profiles/{profileId}", "GET /profiles/{profileId}/document", "POST /sync", "GET /sync", "GET /sync/{jobId}"])
   api_id               = aws_apigatewayv2_api.api.id
   route_key            = each.value
   target               = "integrations/${aws_apigatewayv2_integration.api.id}"

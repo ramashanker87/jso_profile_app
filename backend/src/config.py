@@ -4,6 +4,7 @@ import os
 
 @dataclass(frozen=True)
 class Settings:
+    job_openings_table: str = ""
     sambhav_table: str = ""
     member_form_id: str = ""
     member_status_field: str = ""
@@ -31,6 +32,7 @@ class Settings:
     @classmethod
     def from_env(cls) -> "Settings":
         return cls(
+            job_openings_table=os.getenv("JOB_OPENINGS_TABLE_NAME", ""),
             sambhav_table=os.getenv("SAMBHAV_TABLE_NAME", ""),
             member_form_id=os.getenv("MEMBER_NEETO_FORM_ID", ""),
             member_status_field=os.getenv("MEMBER_NEETO_STATUS_FIELD", ""),

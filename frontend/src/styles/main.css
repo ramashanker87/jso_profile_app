@@ -692,3 +692,13 @@ select {
 .member-affiliation dt { font-weight: 600; }
 .member-affiliation dd { margin: 0; }
 .toolbar { flex-wrap: wrap; }
+
+.job-form { margin-bottom: 24px; }
+.job-form label { display: block; margin: 16px 0 6px; }
+.job-form input { display: block; width: 100%; margin-bottom: 16px; }
+.job-list { display: grid; gap: 18px; }
+.job-card { min-width: 0; }
+.job-card h2, .job-url, .job-delete-confirm { overflow-wrap: anywhere; }
+.job-url { font-size: 14px; color: #52665a; }
+.job-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.job-delete-confirm { margin-top: 18px; border-top: 1px solid #dce5dd; padding-top: 12px; }

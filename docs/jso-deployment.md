@@ -221,3 +221,20 @@ Terraform validation and desktop/mobile editor checks. A live test verified
 metadata save/reload, unapproved-access rejection, signed POST and CORS, PDF
 validation, private download and cross-idea document isolation. Temporary data
 was removed and the original domain restored after verification.
+
+## Shared Jobs section — 16 September 2026
+
+Deployed `/jobs` with link-only posting, optional titles, links to job descriptions
+on the original website, and confirmed deletion of closed listings. All approved
+users can add and remove listings. A dedicated on-demand DynamoDB table,
+`profile-library-prod-job-openings`, stores job links independently of sync jobs,
+with encryption, point-in-time recovery, and table deletion protection.
+
+Terraform applied four additions (one table and three protected API routes) and
+four in-place updates, with no resource deletion. Validation: 144 backend tests,
+53 frontend tests, production build, and Terraform validation passed. Direct live
+Lambda checks using simulated authorizer claims verified approval enforcement,
+creation, persistent listing, duplicate rejection, and deletion; the temporary
+verification listing was removed. API Gateway rejected anonymous Jobs access
+with HTTP 401. Frontend assets were published and CloudFront invalidation requested.
+A real signed-in browser session was not exercised during this deployment.

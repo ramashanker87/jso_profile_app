@@ -62,6 +62,10 @@ def handle(event: dict[str, Any], runtime: Any) -> dict[str, Any]:
         if method == "POST" and path == "/webhooks/neetform":
             return response(202, neeto_webhook.handle(runtime, event))
         authorize(event, runtime)
+        if path == "/job-openings" or path.startswith("/job-openings/"):
+            from src.handlers import job_openings
+            return response(201 if method == "POST" and path == "/job-openings" else 200,
+                            job_openings.handle(runtime, event, method, path))
         if path == "/sambhav" or path.startswith("/sambhav/"):
             from src.handlers import sambhav
             return response(200, sambhav.handle(runtime, event, method, path))

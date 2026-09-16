@@ -17,6 +17,7 @@ from src.handlers.api import handle
 from src.handlers.worker import handle as work
 from src.repositories.profile_repository import MemoryProfileRepository
 from src.repositories.job_repository import MemoryJobRepository
+from src.repositories.job_opening_repository import MemoryJobOpeningRepository
 from src.services.storage_service import LocalStorageService, SafeDownloader
 from src.services.secrets_service import SecretsService
 
@@ -48,6 +49,7 @@ def main():
         storage,
         SecretsService(local=True),
         lambda event: executor.submit(work, event, None, runtime),
+        job_openings=MemoryJobOpeningRepository(),
     )
 
     class Handler(BaseHTTPRequestHandler):
@@ -61,13 +63,16 @@ def main():
                 "Access-Control-Allow-Headers",
                 "Authorization,Content-Type,x-neeto-webhook-signature",
             )
-            self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+            self.send_header("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS")
             self.end_headers()
 
         def do_GET(self):
             self.route()
 
         def do_POST(self):
+            self.route()
+
+        def do_DELETE(self):
             self.route()
 
         def route(self):

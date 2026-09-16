@@ -17,6 +17,7 @@ export function Header() {
           </NavLink>
           <NavLink to="/members">Members</NavLink>
           <NavLink to="/sambhav">Sambhav</NavLink>
+          <NavLink to="/jobs">Jobs</NavLink>
         </nav>
         <div className="account">
           <span>{auth.user}</span>

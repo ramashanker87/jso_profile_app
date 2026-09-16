@@ -649,7 +649,7 @@ it("shows Idea Incubation and opens Sambhav next to Members", async () => {
   const nav = screen.getByRole("navigation", { name: "Main navigation" });
   expect(
     Array.from(nav.querySelectorAll("a")).map((link) => link.textContent),
-  ).toEqual(["Idea Incubation", "Members", "Sambhav"]);
+  ).toEqual(["Idea Incubation", "Members", "Sambhav", "Jobs"]);
   await userEvent.click(screen.getByRole("link", { name: "Sambhav" }));
   expect(
     await screen.findByRole("heading", { name: "Sambhav" }),

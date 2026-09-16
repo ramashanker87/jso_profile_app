@@ -4,6 +4,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { ProfileList } from "./pages/ProfileList";
 import { Sambhav, SambhavDetail } from "./pages/Sambhav";
 import { ProfileDetail } from "./pages/ProfileDetail";
+import { Jobs } from "./pages/Jobs";
 export function App() {
   return (
     <Routes>
@@ -21,6 +22,7 @@ export function App() {
           element={<SambhavDetail />}
         />
         <Route path="/members" element={<ProfileList members />} />
+        <Route path="/jobs" element={<Jobs />} />
         <Route path="/members/:id" element={<ProfileDetail members />} />
         <Route path="/profiles/:id" element={<ProfileDetail />} />
       </Route>

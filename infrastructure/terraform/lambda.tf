@@ -12,7 +12,7 @@ resource "aws_lambda_function" "api" {
   source_code_hash = filebase64sha256(var.lambda_zip_path)
   memory_size      = 512
   timeout          = 30
-  environment { variables = merge(local.common_env, { FRONTEND_ORIGIN = local.frontend_origin, COGNITO_USER_POOL_ID = local.pool_id, SAMBHAV_TABLE_NAME = aws_dynamodb_table.sambhav.name }) }
+  environment { variables = merge(local.common_env, { FRONTEND_ORIGIN = local.frontend_origin, COGNITO_USER_POOL_ID = local.pool_id, SAMBHAV_TABLE_NAME = aws_dynamodb_table.sambhav.name, JOB_OPENINGS_TABLE_NAME = aws_dynamodb_table.job_openings.name }) }
   depends_on = [aws_iam_role_policy.api]
 }
 resource "aws_lambda_function" "worker" {

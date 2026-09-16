@@ -28,6 +28,14 @@ class Runtime:
     member_jobs: Any = None
     cognito: Any = None
     sambhav: Any = None
+    job_openings: Any = None
+
+    def job_opening_service(self):
+        from src.errors import AppError
+        from src.services.job_opening_service import JobOpeningService
+        if self.job_openings is None:
+            raise AppError("Jobs are not configured.", 503, "NOT_CONFIGURED")
+        return JobOpeningService(self.job_openings)
 
     def sambhav_service(self):
         from src.services.sambhav_service import SambhavService
@@ -81,6 +89,7 @@ class Runtime:
 
 
 def aws_runtime() -> Runtime:
+    from src.repositories.job_opening_repository import DynamoJobOpeningRepository
     settings = Settings.from_env()
     session = boto3.Session(region_name=settings.region)
     config = Config(connect_timeout=5, read_timeout=20, retries={"max_attempts": 2})
@@ -124,4 +133,5 @@ def aws_runtime() -> Runtime:
         DynamoJobRepository(dynamodb.Table(settings.job_table), session.client("dynamodb", config=config), kind="members"),
         session.client("cognito-idp", config=config),
         dynamodb.Table(settings.sambhav_table) if settings.sambhav_table else None,
+        DynamoJobOpeningRepository(dynamodb.Table(settings.job_openings_table)) if settings.job_openings_table else None,
     )
